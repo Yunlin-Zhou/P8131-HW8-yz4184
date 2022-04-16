@@ -11,6 +11,9 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```{r, echo = T, message = FALSE, results='hide', warning=FALSE}
 library(tidyverse)
 library(ggplot2)
+library(gee)
+library(lme4)
+library(nlme)
 ```
 
 ```{r, message = FALSE, results='hide', warning=FALSE}
@@ -20,7 +23,8 @@ health_df = readxl::read_xlsx("./HW8-HEALTH.xlsx")%>%
   drop_na()%>%
   mutate(txt = as.factor(txt),
          health = as.factor(health),
-         agegroup = as.factor(agegroup))
+         agegroup = as.factor(agegroup),
+         time = as.integer(time))
 ```
 
 # Part A
@@ -28,9 +32,10 @@ health_df = readxl::read_xlsx("./HW8-HEALTH.xlsx")%>%
 First, we plot the count of participants health self-rating counts in different treatment groups.
 
 ```{r}
-health_df %>%
-  filter(time == 1) %>%
-  ggplot(aes(x= health, fill = health)) +
+health_random = health_df %>%
+  filter(time == 1)
+
+ggplot(data = health_random, aes(x= health, fill = health)) +
   geom_bar() + 
   facet_grid(cols = vars(txt))
 ```
@@ -40,14 +45,11 @@ At the time of randomization, the control group doesn't show significant differe
 Then, we would like to use logistic model to test the relationship between randomized group assignment and participants health self-rating.
  
 ```{r}
-health_random = health_df %>%
-  filter(time == 1)
-
 glm = glm(health ~ txt,
           family = binomial(link = "logit"),
           data = health_random)
-summary(glm)
 
+summary(glm)
 ```
 
 The odds ratio of having good health is expected to be `r exp(glm$coefficients[2])` for intervention group compared to control group.
@@ -58,11 +60,37 @@ The p value for the coefficient is 0.486 which is greater than 0.05, which indic
 # Part b
 
 ```{r}
+health_follow = health_df %>%
+  mutate(health = as.numeric(health == "Good"))%>%
+  filter(!id %in% names(which(table(health_df$id) == 1)))
 
+resp <- subset(health_follow, time != 1)
+
+resp$baseline <- rep(subset(health_follow, time == 1)$health, as.numeric(table(resp$id)))
+
+resp$nhealth <- as.numeric(resp$health == "Good")
+
+gee = gee(health ~ baseline + txt + time + agegroup,
+          family = "binomial",
+          corstr = "unstructured",
+          id = id,
+          scale.fix = FALSE,
+          data = resp)
+
+summary(gee)
 ```
 
 
 
 
+# Part c
+
+```{r}
+glmm = glmer(health ~ baseline + txt + time + agegroup + (1 | id),
+             family = "binomial",
+             data = resp)
+
+summary(glmm)
+```
 
 
