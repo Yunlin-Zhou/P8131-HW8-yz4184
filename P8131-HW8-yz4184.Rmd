@@ -1,0 +1,68 @@
+---
+title: "P8131-HW8-yz4184"
+author: "Yunlin Zhou"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r, echo = T, message = FALSE, results='hide', warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r, message = FALSE, results='hide', warning=FALSE}
+# Import and clean the data
+health_df = readxl::read_xlsx("./HW8-HEALTH.xlsx")%>%
+  janitor::clean_names()%>%
+  drop_na()%>%
+  mutate(txt = as.factor(txt),
+         health = as.factor(health),
+         agegroup = as.factor(agegroup))
+```
+
+# Part A
+
+First, we plot the count of participants health self-rating counts in different treatment groups.
+
+```{r}
+health_df %>%
+  filter(time == 1) %>%
+  ggplot(aes(x= health, fill = health)) +
+  geom_bar() + 
+  facet_grid(cols = vars(txt))
+```
+
+At the time of randomization, the control group doesn't show significant difference in health self-rating. However, the intervention group shows more poor self-ratings than good  self-ratings.
+
+Then, we would like to use logistic model to test the relationship between randomized group assignment and participants health self-rating.
+ 
+```{r}
+health_random = health_df %>%
+  filter(time == 1)
+
+glm = glm(health ~ txt,
+          family = binomial(link = "logit"),
+          data = health_random)
+summary(glm)
+
+```
+
+The odds ratio of having good health is expected to be `r exp(glm$coefficients[2])` for intervention group compared to control group.
+
+The p value for the coefficient is 0.486 which is greater than 0.05, which indicates strong evidence for the null hypothesis that there is no correlation between treatment group assignment and health status at the time of randomization.
+
+
+# Part b
+
+```{r}
+
+```
+
+
+
+
+
+
