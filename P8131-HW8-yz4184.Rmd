@@ -80,7 +80,15 @@ gee = gee(health ~ baseline + txt + time + agegroup,
 summary(gee)
 ```
 
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(gee$coefficients[2])`, at  at the time of randomization, if take average among all measurements and all subjects within the same subgroup. 
 
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(gee$coefficients[3])`, compare "intervention"  to "control" treatment group, if take average among all measurements and all subjects within the same subgroup. 
+
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(gee$coefficients[4])`, for the follow-up time after  the time of randomization., if take average among all measurements and all subjects within the same subgroup. 
+
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(gee$coefficients[5])`, compare 25-34 age group to 15-24 age group, if take average among all measurements and all subjects within the same subgroup. 
+
+The  odds ratio of participants self-rating "good" compared to "poor" is `r exp(gee$coefficients[5])`, compare 35+ age group to 15-24 age group, if take average among all measurements and all subjects within the same subgroup. 
 
 
 # Part c
@@ -93,4 +101,12 @@ glmm = glmer(health ~ baseline + txt + time + agegroup + (1 | id),
 summary(glmm)
 ```
 
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(2.7813)`, at  at the time of randomization, if take average among all measurements and all subjects within the same subgroup. 
 
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(3.4231 )`, compare "intervention"  to "control" treatment group, if take average among all measurements and all subjects within the same subgroup. 
+
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp(0.2021)`, for the follow-up time after  the time of randomization., if take average among all measurements and all subjects within the same subgroup. 
+
+The odds ratio of participants self-rating "good" compared to "poor" is `r exp( 2.2587 )`, compare 25-34 age group to 15-24 age group, if take average among all measurements and all subjects within the same subgroup. 
+
+The  odds ratio of participants self-rating "good" compared to "poor" is `r exp(1.9803)`, compare 35+ age group to 15-24 age group, if take average among all measurements and all subjects within the same subgroup.
